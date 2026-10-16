@@ -1,0 +1,31 @@
+# --- Godot ---------------------------------------------------------------
+.godot/
+/addons/
+.ggg.state
+/build/
+/reports/
+*.translation
+
+# --- Extensions ----------------------------------------------------------
+/extensions/*/bin/
+/rust/target/
+/cpp/build/
+
+# --- Nix / devenv / direnv -----------------------------------------------
+.devenv*
+devenv.local.nix
+.direnv/
+/result
+
+# --- Local environment ---------------------------------------------------
+.env
+.env.*
+
+# --- Editors / OS / agents -----------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
+.remember/
