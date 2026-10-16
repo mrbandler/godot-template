@@ -7,5 +7,5 @@ reloadable = false
 [libraries]
 
 linux.x86_64 = "res://extensions/cpp/bin/libstamina.so"
-windows.x86_64 = "res://extensions/cpp/bin/c_stamina.dll"
+windows.x86_64 = "res://extensions/cpp/bin/stamina.dll"
 macos = "res://extensions/cpp/bin/libstamina.dylib"
