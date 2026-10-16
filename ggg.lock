@@ -40,3 +40,8 @@ publisher_slug = "tobias-lawrenz"
 asset_slug = "filesystem-dock-tooltips"
 release_id = 7119
 release_version = "v3.0.0"
+
+[[dependency]]
+name = "cyclops-level-builder"
+url = "https://github.com/blackears/cyclopsLevelBuilder/releases/download/v1.5.1/cyclops_level_builder_1.5.1_for_Godot_4.7.zip"
+archive_sha = "f9220923179196a0575162428ce922fdf91578ec0f816c407dd5343401c6a2a5"

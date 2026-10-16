@@ -14,6 +14,9 @@
 /rust/target/
 /cpp/build/
 
+# --- Addon user settings -------------------------------------------------
+/cyclops_settings.config
+
 # --- Nix / devenv / direnv -----------------------------------------------
 .devenv*
 devenv.local.nix

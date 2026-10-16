@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+CyclopsAutoload="*res://addons/cyclops_level_builder/cyclops_autoload.tscn"
 GUIDE="*uid://p2jwrgjcbexr"
 LimboConsole="*uid://dyxornv8vwibg"
 PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
@@ -37,7 +38,7 @@ window/size/viewport_height=720
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/broken_reference_finder/plugin.cfg", "res://addons/todo_tracker/plugin.cfg", "res://addons/unused_resource_finder/plugin.cfg", "res://addons/better_tooltips/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/guide/plugin.cfg", "res://addons/limbo_console/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/yard/plugin.cfg")
+enabled=PackedStringArray("res://addons/broken_reference_finder/plugin.cfg", "res://addons/todo_tracker/plugin.cfg", "res://addons/unused_resource_finder/plugin.cfg", "res://addons/better_tooltips/plugin.cfg", "res://addons/cyclops_level_builder/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/guide/plugin.cfg", "res://addons/limbo_console/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/yard/plugin.cfg")
 
 [input]
 
