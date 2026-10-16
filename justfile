@@ -52,11 +52,11 @@ build-rust profile="debug":
 
 # Rust unit tests (all crates)
 test-rust:
-    {{ if path_exists("rust") == "true" { "cargo test --manifest-path rust/Cargo.toml --workspace" } else { "@echo 'no rust/, skipping'" } }}
+    {{ if path_exists("rust") == "true" { "cargo test --manifest-path rust/Cargo.toml --workspace" } else { "echo 'no rust/, skipping'" } }}
 
 # C++ unit tests (doctest via ctest, all extensions)
 test-cpp:
-    {{ if path_exists("cpp") == "true" { "cmake --preset debug -S cpp && cmake --build cpp/build/debug && ctest --test-dir cpp/build/debug --output-on-failure" } else { "@echo 'no cpp/, skipping'" } }}
+    {{ if path_exists("cpp") == "true" { "cmake --preset debug -S cpp && cmake --build cpp/build/debug && ctest --test-dir cpp/build/debug --output-on-failure" } else { "echo 'no cpp/, skipping'" } }}
 
 # Build every C++ extension into extensions/cpp/bin (profile: debug | release; release on macOS is universal)
 [unix]
