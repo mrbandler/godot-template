@@ -1,6 +1,9 @@
 # --- Godot ---------------------------------------------------------------
 .godot/
-/addons/
+/addons/*
+!/addons/broken_reference_finder/
+!/addons/todo_tracker/
+!/addons/unused_resource_finder/
 .ggg.state
 /build/
 /reports/
