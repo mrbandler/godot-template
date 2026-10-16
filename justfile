@@ -112,3 +112,8 @@ test: test-rust test-cpp test-gd
 
 # Everything CI runs
 check: lint test
+
+# Export a preset (Linux | Windows | macOS) to build/<preset>/ with release libraries
+export preset: (build "release") import
+    mkdir -p build/{{ preset }}
+    {{ godot }} --headless --export-release "{{ preset }}"
