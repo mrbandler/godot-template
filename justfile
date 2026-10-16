@@ -31,7 +31,6 @@ build-rust profile="debug":
     exts=$(cargo metadata --manifest-path $m --no-deps --format-version 1 \
         | jq -r '.packages[].targets[] | select(.crate_types | index("cdylib")) | .name')
     if [ "{{ os() }}" = macos ] && [ "{{ profile }}" = release ]; then
-        rustup target add aarch64-apple-darwin x86_64-apple-darwin
         cargo build --manifest-path $m --workspace $flag --target aarch64-apple-darwin
         cargo build --manifest-path $m --workspace $flag --target x86_64-apple-darwin
         for e in $exts; do
