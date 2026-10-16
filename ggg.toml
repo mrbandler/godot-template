@@ -3,3 +3,54 @@ godot = "4.7.2-stable"
 
 [sync]
 force_overwrite = ["**/*.import", "**/*.uid"]
+
+[[dependency]]
+name = "gdunit4"
+git = "https://github.com/godot-gdunit-labs/gdUnit4.git"
+rev = "v6.2.2"
+exclude = ["addons/gdUnit4/test"]
+
+[[dependency.map]]
+from = "addons/gdUnit4"
+
+[[dependency]]
+name = "phantom-camera"
+git = "https://github.com/ramokz/phantom-camera.git"
+rev = "v0.11.0.3"
+
+[[dependency.map]]
+from = "addons/phantom_camera"
+
+[[dependency]]
+name = "limbo-console"
+url = "https://github.com/limbonaut/limbo_console/releases/download/v0.8.0/limbo_console_v0.8.0.zip"
+sha256 = "68cee989910322561222fde3261871a7bd0878122147a949bbb7a27fabef8d9a"
+
+[[dependency]]
+name = "guide"
+git = "https://github.com/godotneers/G.U.I.D.E.git"
+rev = "v0.15.0"
+
+[[dependency.map]]
+from = "addons/guide"
+
+[[dependency]]
+name = "limboai"
+url = "https://github.com/limbonaut/limboai/releases/download/v1.8.1/limboai%2Bv1.8.1.gdextension-4.6.zip"
+sha256 = "0910411f8dbc0da8920f6c8bbbb6397c347cd9f2f193942468a702dfb11d5f0e"
+
+[[dependency.map]]
+from = "addons/limboai"
+
+[[dependency]]
+name = "yard"
+git = "https://github.com/elliotfontaine/yard-godot.git"
+rev = "v1.3.1"
+
+[[dependency.map]]
+from = "addons/yard"
+
+[[dependency]]
+name = "better-tooltips"
+asset_store_asset = "tobias-lawrenz/filesystem-dock-tooltips:v3.0.0"
+map = [{ from = "better_tooltips", to = "addons/better_tooltips" }]
