@@ -1,0 +1,16 @@
+[package]
+name = "health"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+# cdylib: loaded by Godot as its own GDExtension. rlib: lets tests/ and other crates link it.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+godot.workspace = true
+
+[lints]
+workspace = true

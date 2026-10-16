@@ -1,0 +1,11 @@
+[configuration]
+
+entry_symbol = "health_init"
+compatibility_minimum = 4.7
+reloadable = true
+
+[libraries]
+
+linux.x86_64 = "res://extensions/rust/bin/libhealth.so"
+windows.x86_64 = "res://extensions/rust/bin/health.dll"
+macos = "res://extensions/rust/bin/libhealth.dylib"
