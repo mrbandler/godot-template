@@ -6,7 +6,7 @@
 
 // Godot-facing wrapper around game::Stamina.
 class CppStamina : public godot::RefCounted {
-    GDCLASS(CppStamina, godot::RefCounted)
+    GDCLASS(CppStamina, godot::RefCounted) // NOLINT(modernize-use-auto): inside the GDCLASS macro
 
   public:
     void setup(int max) { inner_ = game::Stamina(max); }

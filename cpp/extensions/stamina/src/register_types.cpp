@@ -1,5 +1,6 @@
 #include <gdextension_interface.h>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
 #include "cpp_stamina.hpp"
@@ -13,7 +14,7 @@ static void initialize(ModuleInitializationLevel level) {
     GDREGISTER_CLASS(CppStamina);
 }
 
-static void uninitialize(ModuleInitializationLevel) {}
+static void uninitialize(ModuleInitializationLevel /*level*/) {}
 
 extern "C" GDExtensionBool GDE_EXPORT stamina_init(GDExtensionInterfaceGetProcAddress get_proc_address,
                                                    GDExtensionClassLibraryPtr library,

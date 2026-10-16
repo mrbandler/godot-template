@@ -1,5 +1,6 @@
 extends GdUnitTestSuite
 
+
 func test_rust_health_damage_and_heal() -> void:
 	var health := RustHealth.new()
 	health.setup(100)

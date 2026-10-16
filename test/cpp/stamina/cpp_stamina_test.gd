@@ -1,5 +1,6 @@
 extends GdUnitTestSuite
 
+
 func test_cpp_stamina_spend_and_recover() -> void:
 	var stamina := CppStamina.new()
 	stamina.setup(100)

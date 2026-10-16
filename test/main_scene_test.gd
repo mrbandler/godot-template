@@ -1,5 +1,6 @@
 extends GdUnitTestSuite
 
+
 func test_accept_deals_damage() -> void:
 	var runner := scene_runner("res://src/main.tscn")
 	var label: Label = runner.find_child("HealthLabel")

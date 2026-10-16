@@ -1,3 +1,5 @@
+#include <godot_cpp/core/class_db.hpp>
+
 #include "cpp_stamina.hpp"
 
 using godot::ClassDB;

@@ -96,3 +96,19 @@ build-cpp profile="debug":
 
 # Build all extensions
 build profile="debug": (build-rust profile) (build-cpp profile)
+
+# Format all code
+fmt:
+    -gdscript-formatter $(git ls-files '*.gd' ':!addons')
+    {{ if path_exists("rust") == "true" { "cargo fmt --manifest-path rust/Cargo.toml --all" } else { "" } }}
+    {{ if path_exists("cpp") == "true" { "clang-format -i cpp/extensions/*/src/* cpp/extensions/*/tests/*" } else { "" } }}
+
+# Run all pre-commit hooks on every file
+lint:
+    prek run --all-files
+
+# All tests: Rust, C++, then GDScript + engine tests
+test: test-rust test-cpp test-gd
+
+# Everything CI runs
+check: lint test
