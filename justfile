@@ -113,6 +113,11 @@ test: test-rust test-cpp test-gd
 # Everything CI runs
 check: lint test
 
+# Apply repo ruleset and merge settings (needs a GitHub remote and gh auth)
+gh-setup:
+    gh api --method POST "repos/{owner}/{repo}/rulesets" --input .github/rulesets/main.json
+    gh api --method PATCH "repos/{owner}/{repo}" -F allow_squash_merge=true -F allow_merge_commit=false -F allow_rebase_merge=false -F delete_branch_on_merge=true -f squash_merge_commit_title=PR_TITLE -f squash_merge_commit_message=PR_BODY
+
 # Export a preset (Linux | Windows | macOS) to build/<preset>/ with release libraries
 export preset: (build "release") import
     mkdir -p build/{{ preset }}
