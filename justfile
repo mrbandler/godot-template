@@ -12,7 +12,7 @@ import:
     {{ godot }} --headless --editor --quit-after 300
 
 # GDScript tests (GdUnit4). Extra args go to Godot, e.g. display flags under xvfb.
-test-gd *ARGS="--headless --ignoreHeadlessMode": build-rust import
+test-gd *ARGS="--headless --ignoreHeadlessMode": build import
     bash addons/gdUnit4/runtest.sh --godot_binary "$GODOT" -a res://test -c -rd reports {{ ARGS }}
 
 lib_ext := if os() == "macos" { "dylib" } else if os() == "windows" { "dll" } else { "so" }
@@ -53,3 +53,46 @@ build-rust profile="debug":
 # Rust unit tests (all crates)
 test-rust:
     {{ if path_exists("rust") == "true" { "cargo test --manifest-path rust/Cargo.toml --workspace" } else { "@echo 'no rust/, skipping'" } }}
+
+# C++ unit tests (doctest via ctest, all extensions)
+test-cpp:
+    {{ if path_exists("cpp") == "true" { "cmake --preset debug -S cpp && cmake --build cpp/build/debug && ctest --test-dir cpp/build/debug --output-on-failure" } else { "@echo 'no cpp/, skipping'" } }}
+
+# Build every C++ extension into extensions/cpp/bin (profile: debug | release; release on macOS is universal)
+[unix]
+build-cpp profile="debug":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ -d cpp ] || exit 0
+    out=extensions/cpp/bin
+    mkdir -p "$out"
+    exts=$(find cpp/extensions -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+    if [ "{{ os() }}" = macos ] && [ "{{ profile }}" = release ]; then
+        for arch in arm64 x86_64; do
+            triplet=$([ $arch = arm64 ] && echo arm64-osx || echo x64-osx)
+            cmake --preset release -S cpp -B "cpp/build/release-$arch" \
+                -DCMAKE_OSX_ARCHITECTURES=$arch -DVCPKG_TARGET_TRIPLET=$triplet
+            cmake --build "cpp/build/release-$arch" --target $exts
+        done
+        for e in $exts; do
+            lipo -create "cpp/build/release-arm64/extensions/$e/lib$e.dylib" \
+                "cpp/build/release-x86_64/extensions/$e/lib$e.dylib" -output "$out/lib$e.dylib"
+        done
+    else
+        cmake --preset {{ profile }} -S cpp
+        cmake --build cpp/build/{{ profile }} --target $exts
+        for e in $exts; do cp "cpp/build/{{ profile }}/extensions/$e/{{ lib_prefix }}$e.{{ lib_ext }}" "$out/"; done
+    fi
+
+[windows]
+build-cpp profile="debug":
+    if (Test-Path cpp) { \
+      cmake --preset {{ profile }} -S cpp; \
+      $exts = (Get-ChildItem cpp/extensions -Directory).Name; \
+      cmake --build cpp/build/{{ profile }} --target $exts; \
+      New-Item -ItemType Directory -Force extensions/cpp/bin | Out-Null; \
+      foreach ($e in $exts) { Copy-Item "cpp/build/{{ profile }}/extensions/$e/$e.dll" extensions/cpp/bin/ } \
+    }
+
+# Build all extensions
+build profile="debug": (build-rust profile) (build-cpp profile)

@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
   # ggg.toml is the single source for the Godot version.
   gggConfig = builtins.fromTOML (builtins.readFile ./ggg.toml);
@@ -54,7 +54,7 @@ in
   env = {
     GODOT = godotBin;
     GGG_GODOT_EXECUTABLE = godotBin;
-    VCPKG_ROOT = "./cpp/vcpkg";
+    VCPKG_ROOT = "${config.devenv.root}/cpp/vcpkg";
     VCPKG_FORCE_SYSTEM_BINARIES = "1"; # use Nix cmake/ninja, not vcpkg downloads
     RUST_BACKTRACE = "1";
   };
