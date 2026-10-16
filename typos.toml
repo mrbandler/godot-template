@@ -1,6 +1,6 @@
 # https://github.com/crate-ci/typos/blob/master/docs/reference.md
 [files]
-extend-exclude = ["*.lock", "LICENSE", "cpp/godot-cpp", "cpp/vcpkg", "addons", "*.tscn", "*.tres", "*.import", "*.uid"]
+extend-exclude = ["*.lock", "LICENSE", "cpp/godot-cpp", "cpp/vcpkg", "addons", "*.tscn", "*.tres", "*.import", "*.uid", "CHANGELOG.md"]
 
 [default.extend-words]
 # Project-specific words that typos flags wrongly, e.g. `ratatui = "ratatui"`.

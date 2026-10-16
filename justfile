@@ -122,3 +122,9 @@ gh-setup:
 export preset: (build "release") import
     mkdir -p build/{{ preset }}
     {{ godot }} --headless --export-release "{{ preset }}"
+
+# Store itch.io credentials for the release workflow (needs gh). Create a key at https://itch.io/user/settings/api-keys
+itch-setup user game:
+    gh secret set BUTLER_API_KEY
+    gh variable set ITCH_USER --body "{{ user }}"
+    gh variable set ITCH_GAME --body "{{ game }}"
