@@ -3,8 +3,6 @@
   "release-type": "simple",
   "include-component-in-tag": false,
   "packages": {
-    ".": {
-      "extra-files": [{ "type": "toml", "path": "rust/Cargo.toml", "jsonpath": "$.workspace.package.version" }]
-    }
+    ".": {}
   }
 }

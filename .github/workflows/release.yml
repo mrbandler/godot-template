@@ -23,9 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest, preset: Linux, channel: linux, butler: linux-amd64 }
-          - { os: windows-latest, preset: Windows, channel: windows, butler: windows-amd64 }
-          - { os: macos-latest, preset: macOS, channel: macos, butler: darwin-arm64 }
+          - { os: ubuntu-latest, preset: Linux, push: build/Linux, channel: linux, butler: linux-amd64 }
+          - { os: windows-latest, preset: Windows, push: build/Windows, channel: windows, butler: windows-amd64 }
+          - { os: macos-latest, preset: macOS, push: build/macOS/game.zip, channel: macos, butler: darwin-arm64 }
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -47,6 +47,10 @@ jobs:
       # MSVC environment for CMake on Windows
       - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         if: runner.os == 'Windows'
+      # Git Bash's /usr/bin/link shadows MSVC link.exe; workaround recommended by msvc-dev-cmd.
+      - name: Remove GNU link
+        if: runner.os == 'Windows'
+        run: rm /usr/bin/link.exe
       - name: Bootstrap vcpkg
         run: |
           if [ "$RUNNER_OS" = Windows ]; then cpp/vcpkg/bootstrap-vcpkg.bat -disableMetrics; else cpp/vcpkg/bootstrap-vcpkg.sh -disableMetrics; fi
@@ -86,8 +90,8 @@ jobs:
           CHANNEL: ${{ github.ref_type == 'tag' && matrix.channel || format('{0}-dev', matrix.channel) }}
           VERSION: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
           BUTLER_OS: ${{ matrix.butler }}
-          PRESET: ${{ matrix.preset }}
+          PUSH: ${{ matrix.push }}
         run: |
           curl -fsSL -o butler.zip "https://broth.itch.zone/butler/$BUTLER_OS/LATEST/archive/default"
           unzip -q butler.zip -d butler && chmod +x butler/butler* || true
-          ./butler/butler push "build/$PRESET" "$TARGET:$CHANNEL" --userversion "${VERSION:0:12}"
+          ./butler/butler push "$PUSH" "$TARGET:$CHANNEL" --userversion "${VERSION:0:12}"
