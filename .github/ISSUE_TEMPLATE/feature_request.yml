@@ -72,7 +72,7 @@ body:
         Code snippets, API sketches, or diagrams are all helpful.
       placeholder: |
         ```gdscript
-        // Example usage
+        # Example usage
         ```
 
   - type: textarea

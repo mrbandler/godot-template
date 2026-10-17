@@ -18,7 +18,6 @@ body:
         - API/Code documentation
         - Examples
         - CONTRIBUTING guide
-        - Book / Tutorials
         - Other
     validations:
       required: true
@@ -43,7 +42,7 @@ body:
     attributes:
       label: Location
       description: Where is the documentation located? (file path, URL, or section name)
-      placeholder: e.g., README.md, docs/src/introduction.md
+      placeholder: e.g., README.md, the Testing section
     validations:
       required: true
 
