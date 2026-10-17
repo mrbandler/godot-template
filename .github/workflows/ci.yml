@@ -40,7 +40,7 @@ jobs:
         run: devenv shell -- bash -c 'cd rust && cargo shear'
       - name: Test
         run: |
-          devenv shell -- xvfb-run -a just test-gd --audio-driver Dummy --display-driver x11 --rendering-driver opengl3 --ignoreHeadlessMode
+          devenv shell -- just test-gd
           devenv shell -- just test-rust test-cpp
       - uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d # v6.6.1
         if: always()

@@ -12,7 +12,7 @@ default:
 import:
     {{ godot }} --headless --editor --quit-after 300
 
-# GDScript tests (GdUnit4). Extra args go to Godot, e.g. display flags under xvfb.
+# GDScript tests (GdUnit4), headless. Extra args go to Godot.
 # Reports go to the repo-root reports/, outside res://.
 [working-directory("godot")]
 test-gd *ARGS="--headless --ignoreHeadlessMode": build import

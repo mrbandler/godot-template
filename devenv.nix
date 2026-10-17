@@ -50,7 +50,7 @@ in
     python3 # godot-cpp binding generator
     vcpkg-tool
     clang-tools # clang-format
-  ] ++ lib.optionals stdenv.isLinux [ xvfb-run ];
+  ];
 
   env = {
     GODOT = godotBin;
