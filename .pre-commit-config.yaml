@@ -55,6 +55,12 @@ repos:
         entry: gdscript-formatter lint
         language: system
         files: \.gd$
+      - id: project-layout
+        name: project layout
+        entry: python3 tools/check_layout.py
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: cargo-fmt
         name: cargo fmt
         entry: cargo fmt --manifest-path rust/Cargo.toml --all

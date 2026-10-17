@@ -50,6 +50,11 @@ Tests need devenv: `just test-gd` uses `$GODOT`, which only devenv sets.
 | `devenv.nix`, `justfile`, `.pre-commit-config.yaml` | Tooling |
 | `.github/` | Workflows, dependabot, repo ruleset |
 
+The `project-layout` hook (`tools/check_layout.py`, tracked files only) enforces: `.gd` files live under
+`scripts/` or `test/`, `.tscn` files under `game/`, every `scripts/<p>/` with scripts (except `components/`,
+`autoloads/`) has a `game/<p>/` folder, and Godot-owned paths are lowercase snake_case (`assets/kenney/`
+keeps its third-party names as shipped).
+
 `rust/`, `cpp/` and `raw/` carry `.gdignore` so the editor skips build trees. `docs/` is local-only.
 
 ## Assets and Git LFS
