@@ -131,10 +131,42 @@ export preset: (build "release") import
 export preset: (build "release") import
     New-Item -ItemType Directory -Force build/{{ preset }} | Out-Null; New-Item -ItemType File -Force build/.gdignore | Out-Null; {{ godot }} --headless --export-release "{{ preset }}"
 
+# One-shot setup right after "Use this template" + clone: LFS, repo settings, labels. Never pushes.
+[unix]
+init:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! grep -q '^# lfs-template:start' .gitattributes; then
+        echo "already initialised" >&2
+        exit 1
+    fi
+    gh auth status >/dev/null 2>&1 || { echo "gh is not logged in: run 'gh auth login' first" >&2; exit 1; }
+    git remote get-url origin >/dev/null 2>&1 || { echo "no 'origin' remote: create the repo from the template and clone it first" >&2; exit 1; }
+
+    just lfs-adopt
+    # The setup commit lands on main before the ruleset and feature-branch flow exist.
+    SKIP=no-commit-to-branch git commit -m "build: move Kenney assets into Git LFS"
+
+    just gh-setup
+
+    # Labels dependabot applies (dependabot.yml `labels: [a, b]` lines)
+    grep -h 'labels:' .github/dependabot.yml | sed 's/.*\[\(.*\)\].*/\1/' | tr ',' '\n' | tr -d ' ' | sort -u \
+        | while read -r label; do gh label create "$label" --force; done
+
+    cat <<'EOF'
+
+    Done. Remaining manual steps:
+      1. Create the GitHub App and set APP_CLIENT_ID / APP_PRIVATE_KEY (README, Releasing, step 2).
+      2. just itch-setup <user> <game>
+      3. Rename the game: config/name in project.godot, application/bundle_identifier in export_presets.cfg.
+      4. git push (puts the setup commit on main), then work on feature branches
+    EOF
+
 # One-shot: move the Kenney packs into Git LFS (the template ships them as plain git)
 [unix]
 lfs-adopt:
     sed -i.bak '/^# lfs-template:start/,/^# lfs-template:end/d' .gitattributes && rm .gitattributes.bak
+    awk 'NF{for(;n>0;n--)print "";print;next}{n++}' .gitattributes > .gitattributes.new && mv .gitattributes.new .gitattributes
     git add .gitattributes && git add --renormalize assets/kenney
     @echo "now commit: git commit -m 'build: move Kenney assets into Git LFS'"
 

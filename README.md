@@ -16,11 +16,17 @@ from the first commit, with automated builds and releases to itch.io.
 1. Click **Use this template** on GitHub, then clone with `git clone --recurse-submodules`
    (the C++ side needs both `cpp/godot-cpp` and `cpp/vcpkg`; the devenv shell also initialises them).
 2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks, pulls LFS files and runs `ggg sync`.
-3. `just test`
-   Optional: `just lfs-adopt` moves the Kenney packs into Git LFS like the rest of your assets (it edits
-   `.gitattributes` and stages the files; then commit).
+3. `just init` (once, needs `gh auth login` and the `origin` remote). It:
+   - runs `just lfs-adopt` and commits the result (Kenney packs move into Git LFS),
+   - runs `just gh-setup` (ruleset and squash-only merges),
+   - creates the dependabot labels,
+   - prints the remaining manual steps. It never pushes.
+   Then `just test`.
 4. `ggg edit` (or `godot -e`) to open the editor.
 5. Rename the game: `config/name` in `project.godot` and `application/bundle_identifier` in `export_presets.cfg`.
+6. Finish the manual steps in [Releasing](#releasing) (GitHub App, `just itch-setup`), then `git push`.
+
+`just lfs-adopt` and `just gh-setup` also work on their own.
 
 ### Without Nix
 
@@ -196,10 +202,8 @@ recipe and CI step skips itself when the folder is gone.
 
 Setup, once per repository created from the template:
 
-1. `just gh-setup` applies the `main` ruleset and squash-only merges (needs `gh auth login`).
-2. Create the labels dependabot uses: `gh label create dependencies`, `gh label create rust`,
-   `gh label create cpp`, `gh label create github-actions` (`gh-setup` does not).
-3. **GitHub App** for release-please (create once per account, install on each repo). Actions run
+1. `just init` already applied the `main` ruleset (`just gh-setup`) and created the dependabot labels.
+2. **GitHub App** for release-please (create once per account, install on each repo). Actions run
    with the built-in `GITHUB_TOKEN`, and GitHub deliberately does not start other workflows from
    events that token causes. With it, CI would never run on the release PR (so the required
    checks never pass and it can't be merged) and the release tag would never trigger
@@ -209,7 +213,7 @@ Setup, once per repository created from the template:
    - Generate a private key, then install the App on this repo.
    - Add the secrets: `gh secret set APP_CLIENT_ID` (the App's Client ID) and
      `gh secret set APP_PRIVATE_KEY < key.pem`.
-4. `just itch-setup <user> <game>` stores `BUTLER_API_KEY` (create a key at
+3. `just itch-setup <user> <game>` stores `BUTLER_API_KEY` (create a key at
    <https://itch.io/user/settings/api-keys>) and the `ITCH_USER` / `ITCH_GAME` variables.
 
 Flow:
