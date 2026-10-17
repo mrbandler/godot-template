@@ -39,8 +39,10 @@ Tests need devenv: `just test-gd` uses `$GODOT`, which only devenv sets.
 | `project.godot`, `export_presets.cfg` | Godot project at the repo root; Windows, Linux, macOS presets |
 | `ggg.toml`, `ggg.lock` | Godot version, export templates, addons |
 | `addons/` | Installed by `ggg sync`. Never edit. Three vendored addons are in git (see Addons) |
-| `src/` | GDScript game code and main scene (sample: class `Health`) |
-| `test/` | GdUnit4 tests; `test/rust/`, `test/cpp/` hold engine tests for the extensions |
+| `game/` | Features: scenes plus the feature's own assets (e.g. `game/main/main.tscn`) |
+| `scripts/` | All GDScript, at the same relative path as its feature in `game/` (`game/characters/player/player.tscn` uses `scripts/characters/player/player.gd`). Scene-less reusable code goes in `scripts/components/` (sample: class `Health`), singletons in `scripts/autoloads/` |
+| `test/` | GdUnit4 tests, mirroring `scripts/` (`scripts/components/health.gd` is tested by `test/components/health_test.gd`); `test/rust/`, `test/cpp/` hold engine tests for the extensions |
+| `assets/` | Only content shared across features (Kenney packs); a feature's own assets live next to its scene in `game/` |
 | `extensions/<lang>/` | One `<name>.gdextension` per extension; built libraries in `bin/` (gitignored) |
 | `rust/` | Cargo workspace, `crates/<name>` = one extension (sample: `health`, class `RustHealth`) |
 | `cpp/` | CMake project with `godot-cpp` and `vcpkg` submodules; `extensions/<name>` = one extension (sample: `stamina`, class `CppStamina`) |
@@ -83,7 +85,7 @@ without engine types; a thin Godot class wraps it.
 
 | | Unit (no engine) | Engine (headless Godot) |
 |---|---|---|
-| GDScript | GdUnit4 `test/health_test.gd` | GdUnit4 scene runner `test/main_scene_test.gd` |
+| GDScript | GdUnit4 `test/components/health_test.gd` | GdUnit4 scene runner `test/main/main_scene_test.gd` |
 | Rust | `cargo test` in `rust/crates/health/src/health.rs` | `test/rust/health/rust_health_test.gd` on `RustHealth` |
 | C++ | doctest via ctest, `cpp/extensions/stamina/tests/stamina_test.cpp` | `test/cpp/stamina/cpp_stamina_test.gd` on `CppStamina` |
 
