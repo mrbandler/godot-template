@@ -52,8 +52,10 @@ from = "addons/yard"
 
 [[dependency]]
 name = "better-tooltips"
-asset_store_asset = "tobias-lawrenz/filesystem-dock-tooltips:v3.0.0"
-map = [{ from = "better_tooltips", to = "addons/better_tooltips" }]
+# Git source, not the Asset Store: ggg 0.5.0 reuses the locked store URL, which expires after 10 minutes.
+git = "https://github.com/Tobias004/filesystem_dock_tooltips.git"
+rev = "10de44d45107a8348190a534bc22f8e69356b4b4" # v3.0.0
+map = [{ from = "addons/better_tooltips" }]
 
 [[dependency]]
 name = "cyclops-level-builder"

@@ -34,12 +34,9 @@ sha = "a496be3dfa1279bfdd999950e0936eaac0d84fc3"
 
 [[dependency]]
 name = "better-tooltips"
-url = "https://fra1.digitaloceanspaces.com/asset-store-prod/assets/2125/BetterTooltips_3.0.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO801FM46NRRLXQ9Q3M6%2F20261016%2Ffra1%2Fs3%2Faws4_request&X-Amz-Date=20261016T221407Z&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=45777db8735cae54a8de77c472a70bfeb37e784a9f9a1022aa3a1acb4bfd2f46"
-archive_sha = "da7424402a03c470627cfb1014838c146b98a091dd9882c269f8ba2ba7e20165"
-publisher_slug = "tobias-lawrenz"
-asset_slug = "filesystem-dock-tooltips"
-release_id = 7119
-release_version = "v3.0.0"
+git = "https://github.com/Tobias004/filesystem_dock_tooltips.git"
+rev = "10de44d45107a8348190a534bc22f8e69356b4b4"
+sha = "10de44d45107a8348190a534bc22f8e69356b4b4"
 
 [[dependency]]
 name = "cyclops-level-builder"
