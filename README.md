@@ -13,8 +13,9 @@ from the first commit, with automated builds and releases to itch.io.
 
 ## Quick start
 
-1. Click **Use this template** on GitHub.
-2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks and runs `ggg sync`.
+1. Click **Use this template** on GitHub, then clone with `git clone --recurse-submodules`
+   (the C++ side needs both `cpp/godot-cpp` and `cpp/vcpkg`; the devenv shell also initialises them).
+2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks, pulls LFS files and runs `ggg sync`.
 3. `just test`
    Optional: `just lfs-adopt` moves the Kenney packs into Git LFS like the rest of your assets (it edits
    `.gitattributes` and stages the files; then commit).
@@ -27,6 +28,8 @@ Install [ggg](https://github.com/godotneers/ggg), [rustup](https://rustup.rs), C
 Python 3, then:
 
 ```sh
+git submodule update --init --recursive
+git lfs install && git lfs pull
 ggg sync
 cpp/vcpkg/bootstrap-vcpkg.sh
 just build

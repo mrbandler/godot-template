@@ -61,11 +61,13 @@ in
   };
 
   enterShell = ''
+    git submodule update --init --recursive --quiet || echo "warning: submodule init failed (offline?)"
     # git-lfs first: prek then keeps its pre-push hook as pre-push.legacy and runs it on every push.
     if [ ! -f .git/hooks/pre-push.legacy ]; then
       rm -f .git/hooks/pre-push
       git lfs install --local
     fi
+    git lfs pull >/dev/null 2>&1 || echo "warning: git lfs pull failed (offline or no remote?)"
     prek install
     ggg sync
   '';
