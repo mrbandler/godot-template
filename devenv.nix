@@ -1,7 +1,7 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
-  # ggg.toml is the single source for the Godot version.
-  gggConfig = builtins.fromTOML (builtins.readFile ./ggg.toml);
+  # godot/ggg.toml is the single source for the Godot version.
+  gggConfig = builtins.fromTOML (builtins.readFile ./godot/ggg.toml);
   godot = pkgs.godot_4_7;
   godotBin = lib.getExe godot;
 
@@ -23,7 +23,7 @@ in
   assertions = [
     {
       assertion = godot.version == gggConfig.project.godot;
-      message = "nixpkgs Godot is ${godot.version} but ggg.toml pins ${gggConfig.project.godot}. Update nixpkgs (devenv update) or ggg.toml.";
+      message = "nixpkgs Godot is ${godot.version} but godot/ggg.toml pins ${gggConfig.project.godot}. Update nixpkgs (devenv update) or godot/ggg.toml.";
     }
   ];
 
@@ -37,6 +37,7 @@ in
     ggg
     just
     prek
+    git-lfs
     typos
     zizmor
     cargo-shear
@@ -49,18 +50,25 @@ in
     python3 # godot-cpp binding generator
     vcpkg-tool
     clang-tools # clang-format
-  ] ++ lib.optionals stdenv.isLinux [ xvfb-run ];
+  ];
 
   env = {
     GODOT = godotBin;
     GGG_GODOT_EXECUTABLE = godotBin;
-    VCPKG_ROOT = "./cpp/vcpkg";
+    VCPKG_ROOT = "${config.devenv.root}/cpp/vcpkg";
     VCPKG_FORCE_SYSTEM_BINARIES = "1"; # use Nix cmake/ninja, not vcpkg downloads
     RUST_BACKTRACE = "1";
   };
 
   enterShell = ''
+    git submodule update --init --recursive --quiet || echo "warning: submodule init failed (offline?)"
+    # git-lfs first: prek then keeps its pre-push hook as pre-push.legacy and runs it on every push.
+    if [ ! -f .git/hooks/pre-push.legacy ]; then
+      rm -f .git/hooks/pre-push
+      git lfs install --local
+    fi
+    git lfs pull >/dev/null 2>&1 || echo "warning: git lfs pull failed (offline or no remote?)"
     prek install
-    ggg sync
+    (cd godot && ggg sync)
   '';
 }

@@ -1,0 +1,44 @@
+[[dependency]]
+name = "gdunit4"
+git = "https://github.com/godot-gdunit-labs/gdUnit4.git"
+rev = "v6.2.2"
+sha = "0127a55f4543dfc24746f6e5c7ba6f94105d51f2"
+
+[[dependency]]
+name = "phantom-camera"
+git = "https://github.com/ramokz/phantom-camera.git"
+rev = "v0.11.0.3"
+sha = "cb6e0966ac305202c47f1d1a81c105966e29da96"
+
+[[dependency]]
+name = "limbo-console"
+url = "https://github.com/limbonaut/limbo_console/releases/download/v0.8.0/limbo_console_v0.8.0.zip"
+archive_sha = "68cee989910322561222fde3261871a7bd0878122147a949bbb7a27fabef8d9a"
+
+[[dependency]]
+name = "guide"
+git = "https://github.com/godotneers/G.U.I.D.E.git"
+rev = "v0.15.0"
+sha = "d07e25e95c739990a15ca702eb9fc8b67f3b9546"
+
+[[dependency]]
+name = "limboai"
+url = "https://github.com/limbonaut/limboai/releases/download/v1.8.1/limboai%2Bv1.8.1.gdextension-4.6.zip"
+archive_sha = "0910411f8dbc0da8920f6c8bbbb6397c347cd9f2f193942468a702dfb11d5f0e"
+
+[[dependency]]
+name = "yard"
+git = "https://github.com/elliotfontaine/yard-godot.git"
+rev = "v1.3.1"
+sha = "a496be3dfa1279bfdd999950e0936eaac0d84fc3"
+
+[[dependency]]
+name = "better-tooltips"
+git = "https://github.com/Tobias004/filesystem_dock_tooltips.git"
+rev = "10de44d45107a8348190a534bc22f8e69356b4b4"
+sha = "10de44d45107a8348190a534bc22f8e69356b4b4"
+
+[[dependency]]
+name = "cyclops-level-builder"
+url = "https://github.com/blackears/cyclopsLevelBuilder/releases/download/v1.5.1/cyclops_level_builder_1.5.1_for_Godot_4.7.zip"
+archive_sha = "46d6586b2c4843202318794aefca8e7f4be31bde5b52da3424c9313f21691c11"

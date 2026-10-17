@@ -1,5 +1,0 @@
-[project]
-godot = "4.7.2-stable"
-
-[sync]
-force_overwrite = ["**/*.import", "**/*.uid"]

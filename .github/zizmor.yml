@@ -1,0 +1,6 @@
+rules:
+  cache-poisoning:
+    ignore:
+      # Release builds only run on pushes to main and version tags (no PR or fork code), and the
+      # caches are restored from entries written by those same trusted refs. Build time wins here.
+      - release.yml

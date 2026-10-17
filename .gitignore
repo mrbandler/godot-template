@@ -1,21 +1,32 @@
 # --- Godot ---------------------------------------------------------------
 .godot/
-/addons/
-.ggg.state
+/godot/addons/*
+!/godot/addons/broken_reference_finder/
+!/godot/addons/todo_tracker/
+!/godot/addons/unused_resource_finder/
 /build/
 /reports/
 *.translation
 
 # --- Extensions ----------------------------------------------------------
-/extensions/*/bin/
+/godot/extensions/*/bin/
 /rust/target/
 /cpp/build/
+
+# --- Addon user settings -------------------------------------------------
+/godot/cyclops_settings.config
 
 # --- Nix / devenv / direnv -----------------------------------------------
 .devenv*
 devenv.local.nix
 .direnv/
 /result
+
+# --- Raw asset tool backups --------------------------------------------
+*.blend[0-9]*
+*.kra~
+*.aup3-shm
+*.aup3-wal
 
 # --- Local environment ---------------------------------------------------
 .env

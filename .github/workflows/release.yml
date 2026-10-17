@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GGG_VERSION: v0.5.0
+
+jobs:
+  release:
+    name: ${{ matrix.preset }}
+    if: ${{ !github.event.repository.is_template }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, preset: Linux, push: build/Linux, channel: linux, butler: linux-amd64 }
+          - { os: windows-latest, preset: Windows, push: build/Windows, channel: windows, butler: windows-amd64 }
+          - { os: macos-latest, preset: macOS, push: build/macOS/game.zip, channel: macos, butler: darwin-arm64 }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+          lfs: true
+      - name: Install Rust from rust-toolchain.toml
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: rust
+      - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
+        with:
+          tool: just
+      - uses: seanmiddleditch/gha-setup-ninja@3b1f8f94a2f8254bd26914c4ab9474d4f0015f67 # v6
+      # MSVC environment for CMake on Windows
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        if: runner.os == 'Windows'
+      # Git Bash's /usr/bin/link shadows MSVC link.exe; workaround recommended by msvc-dev-cmd.
+      - name: Remove GNU link
+        if: runner.os == 'Windows'
+        run: rm /usr/bin/link.exe
+      - name: Bootstrap vcpkg
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then cpp/vcpkg/bootstrap-vcpkg.bat -disableMetrics; else cpp/vcpkg/bootstrap-vcpkg.sh -disableMetrics; fi
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/cpp/vcpkg" >> "$GITHUB_ENV"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.os == 'Windows' && '~\AppData\Local\vcpkg\archives' || '~/.cache/vcpkg/archives' }}
+          key: vcpkg-${{ matrix.os }}-${{ hashFiles('cpp/vcpkg.json', '.gitmodules') }}
+      - name: Install ggg
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            pwsh -c "irm https://github.com/godotneers/ggg/releases/download/$GGG_VERSION/ggg-installer.ps1 | iex"
+          else
+            curl -fsSL "https://github.com/godotneers/ggg/releases/download/$GGG_VERSION/ggg-installer.sh" | sh
+          fi
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Godot, export templates and addons
+        run: ggg sync --with-export-templates
+        working-directory: godot
+      - name: Native unit tests
+        run: just test-rust test-cpp
+      # Godot rewrites project.godot and drops release-please's annotation comments, so stamp the version here.
+      - name: Stamp version from version.txt
+        run: sed -i.bak "s/^config\/version=.*/config\/version=\"$(cat version.txt)\"/" godot/project.godot && rm godot/project.godot.bak
+      - name: Export
+        run: just export "$PRESET"
+        env:
+          PRESET: ${{ matrix.preset }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ matrix.preset }}
+          path: build/${{ matrix.preset }}
+      - name: Push to itch.io
+        if: ${{ vars.ITCH_USER != '' && vars.ITCH_GAME != '' }}
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          TARGET: ${{ vars.ITCH_USER }}/${{ vars.ITCH_GAME }}
+          CHANNEL: ${{ github.ref_type == 'tag' && matrix.channel || format('{0}-dev', matrix.channel) }}
+          VERSION: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+          BUTLER_OS: ${{ matrix.butler }}
+          PUSH: ${{ matrix.push }}
+        run: |
+          curl -fsSL -o butler.zip "https://broth.itch.zone/butler/$BUTLER_OS/LATEST/archive/default"
+          unzip -q butler.zip -d butler && chmod +x butler/butler* || true
+          ./butler/butler push "$PUSH" "$TARGET:$CHANNEL" --userversion "${VERSION:0:12}"
