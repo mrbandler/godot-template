@@ -5,8 +5,8 @@ from the first commit, with automated builds and releases to itch.io.
 
 - GDScript, Rust and C++ side by side, each with a sample class, unit tests and engine tests.
 - TDD: GdUnit4, `cargo test` and doctest, all behind one `just test`.
-- Static typing enforced in `project.godot` (untyped and unsafe warnings are errors; `:=` is fine).
-- Addons pinned and locked with [ggg](https://github.com/godotneers/ggg) (`ggg.toml`, `ggg.lock`).
+- Static typing enforced in `godot/project.godot` (untyped and unsafe warnings are errors; `:=` is fine).
+- Addons pinned and locked with [ggg](https://github.com/godotneers/ggg) (`godot/ggg.toml`, `godot/ggg.lock`).
 - Reproducible dev environment with [devenv](https://devenv.sh) and direnv.
 - Git hooks via prek: conventional commits, formatters, linters, tests before push.
 - release-please versioning and changelog, per-OS exports pushed to itch.io with butler.
@@ -15,7 +15,7 @@ from the first commit, with automated builds and releases to itch.io.
 
 1. Click **Use this template** on GitHub, then clone with `git clone --recurse-submodules`
    (the C++ side needs both `cpp/godot-cpp` and `cpp/vcpkg`; the devenv shell also initialises them).
-2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks, pulls LFS files and runs `ggg sync`.
+2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks, pulls LFS files and runs `ggg sync` in `godot/`.
 3. `just init` (needs `gh auth login` and the `origin` remote; safe to re-run after a failure). It:
    - runs `just lfs-adopt` and commits the result (Kenney packs move into Git LFS),
    - creates the dependabot labels,
@@ -23,8 +23,8 @@ from the first commit, with automated builds and releases to itch.io.
    `init` and `lfs-adopt` need a Unix shell (macOS, Linux, or WSL/Git Bash on Windows).
    Then `just test`.
 4. `git push` (puts the setup commit on main), then `just gh-setup` (ruleset and squash-only merges; run once, after the push, because the ruleset requires PRs).
-5. `ggg edit` (or `godot -e`) to open the editor.
-6. Rename the game: `config/name` in `project.godot` and `application/bundle_identifier` in `export_presets.cfg`.
+5. `cd godot && ggg edit` (or `godot -e --path godot`) to open the editor.
+6. Rename the game: `config/name` in `godot/project.godot` and `application/bundle_identifier` in `godot/export_presets.cfg`.
 7. Finish the manual steps in [Releasing](#releasing) (GitHub App, `just itch-setup`).
 
 `just lfs-adopt` and `just gh-setup` also work on their own.
@@ -37,7 +37,7 @@ Python 3, then:
 ```sh
 git submodule update --init --recursive
 git lfs install && git lfs pull
-ggg sync
+(cd godot && ggg sync)
 cpp/vcpkg/bootstrap-vcpkg.sh
 just build
 ```
@@ -46,28 +46,32 @@ Tests need devenv: `just test-gd` uses `$GODOT`, which only devenv sets.
 
 ## Layout
 
+The Godot project lives in `godot/` (`res://` is `godot/`), so the editor only sees the game.
+Tooling, native sources and raw assets stay at the repo root, outside `res://`.
+
 | Path | Content |
 |---|---|
-| `project.godot`, `export_presets.cfg` | Godot project at the repo root; Windows, Linux, macOS presets |
-| `ggg.toml`, `ggg.lock` | Godot version, export templates, addons |
-| `addons/` | Installed by `ggg sync`. Never edit. Three vendored addons are in git (see Addons) |
-| `game/` | Features: scenes plus the feature's own assets (e.g. `game/main/main.tscn`) |
-| `scripts/` | All GDScript, at the same relative path as its feature in `game/` (`game/characters/player/player.tscn` uses `scripts/characters/player/player.gd`). Scene-less reusable code goes in `scripts/components/` (sample: class `Health`), singletons in `scripts/autoloads/` |
-| `test/` | GdUnit4 tests, mirroring `scripts/` (`scripts/components/health.gd` is tested by `test/components/health_test.gd`); `test/rust/`, `test/cpp/` hold engine tests for the extensions |
-| `assets/` | Only content shared across features (Kenney packs); a feature's own assets live next to its scene in `game/` |
-| `extensions/<lang>/` | One `<name>.gdextension` per extension; built libraries in `bin/` (gitignored) |
+| `godot/project.godot`, `godot/export_presets.cfg` | Godot project; Windows, Linux, macOS presets |
+| `godot/ggg.toml`, `godot/ggg.lock` | Godot version, export templates, addons (run `ggg` in `godot/`) |
+| `godot/addons/` | Installed by `ggg sync`. Never edit. Three vendored addons are in git (see Addons) |
+| `godot/game/` | Features: scenes plus the feature's own assets (e.g. `game/main/main.tscn`) |
+| `godot/scripts/` | All GDScript, at the same relative path as its feature in `game/` (`game/characters/player/player.tscn` uses `scripts/characters/player/player.gd`). Scene-less reusable code goes in `scripts/components/` (sample: class `Health`), singletons in `scripts/autoloads/` |
+| `godot/test/` | GdUnit4 tests, mirroring `scripts/` (`scripts/components/health.gd` is tested by `test/components/health_test.gd`); `test/rust/`, `test/cpp/` hold engine tests for the extensions |
+| `godot/assets/` | Only content shared across features (Kenney packs); a feature's own assets live next to its scene in `game/` |
+| `godot/extensions/<lang>/` | One `<name>.gdextension` per extension; built libraries in `bin/` (gitignored) |
 | `rust/` | Cargo workspace, `crates/<name>` = one extension (sample: `health`, class `RustHealth`) |
 | `cpp/` | CMake project with `godot-cpp` and `vcpkg` submodules; `extensions/<name>` = one extension (sample: `stamina`, class `CppStamina`) |
-| `raw/` | Source assets (Blender, Aseprite, Krita, audio projects), stored via Git LFS; `.gdignore` hides it from Godot |
-| `devenv.nix`, `justfile`, `.pre-commit-config.yaml` | Tooling |
+| `raw/` | Source assets (Blender, Aseprite, Krita, audio projects), stored via Git LFS; outside `res://`, so Godot never scans it |
+| `devenv.nix`, `justfile`, `.pre-commit-config.yaml`, `tools/` | Tooling |
+| `build/`, `reports/` | Export output and GdUnit4 reports (gitignored, outside `res://`) |
 | `.github/` | Workflows, dependabot, repo ruleset |
 
-The `project-layout` hook (`tools/check_layout.py`, tracked files only) enforces: `.gd` files live under
-`scripts/` or `test/`, `.tscn` files under `game/`, every `scripts/<p>/` with scripts (except `components/`,
-`autoloads/`) has a `game/<p>/` folder, and Godot-owned paths are lowercase snake_case (`assets/kenney/`
-keeps its third-party names as shipped).
+The `project-layout` hook (`tools/check_layout.py`, tracked files only) enforces, inside `godot/`: `.gd` files
+live under `scripts/` or `test/`, `.tscn` files under `game/`, every `scripts/<p>/` with scripts (except
+`components/`, `autoloads/`) has a `game/<p>/` folder, and paths are lowercase snake_case (`assets/kenney/`
+keeps its third-party names as shipped, `addons/` is not checked). `.gd` and `.tscn` files outside `godot/` fail.
 
-`rust/`, `cpp/` and `raw/` carry `.gdignore` so the editor skips build trees. `docs/` is local-only.
+`docs/` is local-only.
 
 ## Assets and Git LFS
 
@@ -76,9 +80,9 @@ are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.ts
 `.gd`, `.svg`, `.gltf`) stay in plain git so they diff and merge.
 
 - The devenv shell sets LFS up. Without Nix run `git lfs install` (Git for Windows ships git-lfs).
-- Keep sources in `raw/` (Godot ignores it) and export game-ready files into the project tree.
+- Keep sources in `raw/` (outside `res://`) and export game-ready files into `godot/`.
 - **Use this template** on GitHub cannot copy files stored with Git LFS, so the template ships no LFS
-  files: the Kenney packs under `assets/kenney/` are plain git (`.gitattributes` overrides the LFS rules
+  files: the Kenney packs under `godot/assets/kenney/` are plain git (`.gitattributes` overrides the LFS rules
   there). Your own assets use LFS as described above.
 - Check GitHub's LFS storage and bandwidth limits before committing a lot of large assets.
 
@@ -88,9 +92,9 @@ are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.ts
 
 | Path | Content | License |
 |---|---|---|
-| `assets/kenney/prototype_textures/` | Prototype Textures: 6 colours x 13 grid textures with a ready `texture_NN.tres` material each | CC0 |
-| `assets/kenney/prototype_kit/` | Prototype Kit: 145 greyboxing GLB models (walls, floors, doors, props); `Textures/` holds the colormap and variation-a/b/c | CC0 |
-| `assets/kenney/cursors/` | Cursor Pack: basic default-style mouse cursors (182 images) | CC0 |
+| `godot/assets/kenney/prototype_textures/` | Prototype Textures: 6 colours x 13 grid textures with a ready `texture_NN.tres` material each | CC0 |
+| `godot/assets/kenney/prototype_kit/` | Prototype Kit: 145 greyboxing GLB models (walls, floors, doors, props); `Textures/` holds the colormap and variation-a/b/c | CC0 |
+| `godot/assets/kenney/cursors/` | Cursor Pack: basic default-style mouse cursors (182 images) | CC0 |
 
 Drag a `texture_NN.tres` onto a mesh, CSG or Cyclops block. The materials use world-space
 triplanar mapping, so 1 grid cell = 1 m and neighbouring blocks line up.
@@ -104,9 +108,9 @@ without engine types; a thin Godot class wraps it.
 
 | | Unit (no engine) | Engine (headless Godot) |
 |---|---|---|
-| GDScript | GdUnit4 `test/components/health_test.gd` | GdUnit4 scene runner `test/main/main_scene_test.gd` |
-| Rust | `cargo test` in `rust/crates/health/src/health.rs` | `test/rust/health/rust_health_test.gd` on `RustHealth` |
-| C++ | doctest via ctest, `cpp/extensions/stamina/tests/stamina_test.cpp` | `test/cpp/stamina/cpp_stamina_test.gd` on `CppStamina` |
+| GDScript | GdUnit4 `godot/test/components/health_test.gd` | GdUnit4 scene runner `godot/test/main/main_scene_test.gd` |
+| Rust | `cargo test` in `rust/crates/health/src/health.rs` | `godot/test/rust/health/rust_health_test.gd` on `RustHealth` |
+| C++ | doctest via ctest, `cpp/extensions/stamina/tests/stamina_test.cpp` | `godot/test/cpp/stamina/cpp_stamina_test.gd` on `CppStamina` |
 
 ```sh
 just test        # everything
@@ -128,7 +132,7 @@ Commits to `main` are blocked; work on a branch.
 
 ## Addons
 
-Managed by ggg and installed by `ggg sync`.
+Managed by ggg and installed by `ggg sync` (run in `godot/`).
 
 | Addon | Purpose | Source |
 |---|---|---|
@@ -148,6 +152,7 @@ The last three are vendored because ggg 0.5.0 cannot parse their store entries
 Add an addon:
 
 ```sh
+cd godot
 ggg add git <url> --name <name>
 ggg add asset-store publisher/slug
 ggg sync
@@ -186,7 +191,7 @@ Then `find_package(...)` in `cpp/CMakeLists.txt`. Pin the vcpkg baseline by upda
 ## Extensions
 
 Add one by copying a sample (`rust/crates/health` or `cpp/extensions/stamina`) together with its
-`extensions/<lang>/<name>.gdextension` and `test/<lang>/<name>/`, then rename:
+`godot/extensions/<lang>/<name>.gdextension` and `godot/test/<lang>/<name>/`, then rename:
 
 - the crate (Rust) or CMake target (C++), and the extension name,
 - the entry symbol to `<name>_init`,
@@ -196,7 +201,7 @@ Skip `.uid` files; Godot regenerates them. Names must be unique across Rust and 
 file is the extension name and exports place all libraries flat next to the executable. Shared
 Rust logic can live in plain rlib crates in the workspace.
 
-Remove a language by deleting `<lang>/`, `extensions/<lang>/` and `test/<lang>/`. Every just
+Remove a language by deleting `<lang>/`, `godot/extensions/<lang>/` and `godot/test/<lang>/`. Every just
 recipe and CI step skips itself when the folder is gone.
 
 ## Releasing
@@ -222,7 +227,7 @@ Flow:
 - Conventional commits on `main` keep a release PR open (`CHANGELOG.md`; `version.txt` is the only
   version). Merging it tags `vX.Y.Z`.
 - `release.yml` builds on Ubuntu, Windows and macOS, runs the native unit tests, stamps the
-  `project.godot` version from `version.txt`, exports and pushes with butler.
+  `godot/project.godot` version from `version.txt`, exports and pushes with butler.
 - Tags push the `windows`, `linux` and `macos` channels; pushes to `main` push `windows-dev`,
   `linux-dev` and `macos-dev`.
 - The itch.io push is skipped when `ITCH_USER` / `ITCH_GAME` are unset. Nothing releases from the

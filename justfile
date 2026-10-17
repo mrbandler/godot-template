@@ -8,26 +8,27 @@ default:
     @just --list
 
 # Import the project headless (class cache, extension list)
+[working-directory("godot")]
 import:
     {{ godot }} --headless --editor --quit-after 300
 
 # GDScript tests (GdUnit4). Extra args go to Godot, e.g. display flags under xvfb.
+# Reports go to the repo-root reports/, outside res://.
+[working-directory("godot")]
 test-gd *ARGS="--headless --ignoreHeadlessMode": build import
-    mkdir -p reports
-    touch reports/.gdignore
-    bash addons/gdUnit4/runtest.sh --godot_binary "$GODOT" -a res://test -c -rd reports {{ ARGS }}
+    bash addons/gdUnit4/runtest.sh --godot_binary "$GODOT" -a res://test -c -rd ../reports {{ ARGS }}
 
 lib_ext := if os() == "macos" { "dylib" } else if os() == "windows" { "dll" } else { "so" }
 lib_prefix := if os() == "windows" { "" } else { "lib" }
 
-# Build every Rust extension (cdylib crate) into extensions/rust/bin (profile: debug | release; release on macOS is universal)
+# Build every Rust extension (cdylib crate) into godot/extensions/rust/bin (profile: debug | release; release on macOS is universal)
 [unix]
 build-rust profile="debug":
     #!/usr/bin/env bash
     set -euo pipefail
     [ -d rust ] || exit 0
     m=rust/Cargo.toml
-    out=extensions/rust/bin
+    out=godot/extensions/rust/bin
     mkdir -p "$out"
     flag=$([ "{{ profile }}" = release ] && echo --release || true)
     exts=$(cargo metadata --manifest-path $m --no-deps --format-version 1 \
@@ -47,9 +48,9 @@ build-rust profile="debug":
 build-rust profile="debug":
     if (Test-Path rust) { \
       cargo build --manifest-path rust/Cargo.toml --workspace $(if ("{{ profile }}" -eq "release") { "--release" }); \
-      New-Item -ItemType Directory -Force extensions/rust/bin | Out-Null; \
+      New-Item -ItemType Directory -Force godot/extensions/rust/bin | Out-Null; \
       $meta = cargo metadata --manifest-path rust/Cargo.toml --no-deps --format-version 1 | ConvertFrom-Json; \
-      $meta.packages.targets | Where-Object { $_.crate_types -contains "cdylib" } | ForEach-Object { Copy-Item "rust/target/{{ profile }}/$($_.name).dll" extensions/rust/bin/ } \
+      $meta.packages.targets | Where-Object { $_.crate_types -contains "cdylib" } | ForEach-Object { Copy-Item "rust/target/{{ profile }}/$($_.name).dll" godot/extensions/rust/bin/ } \
     }
 
 # Rust unit tests (all crates)
@@ -60,13 +61,13 @@ test-rust:
 test-cpp:
     {{ if path_exists("cpp") == "true" { "cmake --preset debug -S cpp && cmake --build cpp/build/debug && ctest --test-dir cpp/build/debug --output-on-failure" } else { "echo 'no cpp/, skipping'" } }}
 
-# Build every C++ extension into extensions/cpp/bin (profile: debug | release; release on macOS is universal)
+# Build every C++ extension into godot/extensions/cpp/bin (profile: debug | release; release on macOS is universal)
 [unix]
 build-cpp profile="debug":
     #!/usr/bin/env bash
     set -euo pipefail
     [ -d cpp ] || exit 0
-    out=extensions/cpp/bin
+    out=godot/extensions/cpp/bin
     mkdir -p "$out"
     exts=$(find cpp/extensions -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
     if [ "{{ os() }}" = macos ] && [ "{{ profile }}" = release ]; then
@@ -92,8 +93,8 @@ build-cpp profile="debug":
       cmake --preset {{ profile }} -S cpp; \
       $exts = (Get-ChildItem cpp/extensions -Directory).Name; \
       cmake --build cpp/build/{{ profile }} --target $exts; \
-      New-Item -ItemType Directory -Force extensions/cpp/bin | Out-Null; \
-      foreach ($e in $exts) { Copy-Item "cpp/build/{{ profile }}/extensions/$e/$e.dll" extensions/cpp/bin/ } \
+      New-Item -ItemType Directory -Force godot/extensions/cpp/bin | Out-Null; \
+      foreach ($e in $exts) { Copy-Item "cpp/build/{{ profile }}/extensions/$e/$e.dll" godot/extensions/cpp/bin/ } \
     }
 
 # Build all extensions
@@ -101,7 +102,7 @@ build profile="debug": (build-rust profile) (build-cpp profile)
 
 # Format all code
 fmt:
-    -gdscript-formatter $(git ls-files '*.gd' ':!addons')
+    -gdscript-formatter $(git ls-files '*.gd' ':!godot/addons')
     {{ if path_exists("rust") == "true" { "cargo fmt --manifest-path rust/Cargo.toml --all" } else { "" } }}
     {{ if path_exists("cpp") == "true" { "clang-format -i cpp/extensions/*/src/* cpp/extensions/*/tests/*" } else { "" } }}
 
@@ -120,16 +121,17 @@ gh-setup:
     gh api --method POST "repos/{owner}/{repo}/rulesets" --input .github/rulesets/main.json
     gh api --method PATCH "repos/{owner}/{repo}" -F allow_squash_merge=true -F allow_merge_commit=false -F allow_rebase_merge=false -F delete_branch_on_merge=true -f squash_merge_commit_title=PR_TITLE -f squash_merge_commit_message=PR_BODY
 
-# Export a preset (Linux | Windows | macOS) to build/<preset>/ with release libraries
+# Export a preset (Linux | Windows | macOS) to the repo-root build/<preset>/ (outside res://) with release libraries
 [unix]
+[working-directory("godot")]
 export preset: (build "release") import
-    mkdir -p build/{{ preset }}
-    touch build/.gdignore
+    mkdir -p ../build/{{ preset }}
     {{ godot }} --headless --export-release "{{ preset }}"
 
 [windows]
+[working-directory("godot")]
 export preset: (build "release") import
-    New-Item -ItemType Directory -Force build/{{ preset }} | Out-Null; New-Item -ItemType File -Force build/.gdignore | Out-Null; {{ godot }} --headless --export-release "{{ preset }}"
+    New-Item -ItemType Directory -Force ../build/{{ preset }} | Out-Null; {{ godot }} --headless --export-release "{{ preset }}"
 
 # One-shot setup right after "Use this template" + clone: LFS and labels. Safe to re-run. Never pushes.
 [unix]
@@ -158,7 +160,7 @@ init:
       2. just gh-setup (ruleset and merge settings; run once, after the push)
       3. Create the GitHub App and set APP_CLIENT_ID / APP_PRIVATE_KEY (README, Releasing, step 2)
       4. just itch-setup <user> <game>
-      5. Rename the game: config/name in project.godot, application/bundle_identifier in export_presets.cfg
+      5. Rename the game: config/name in godot/project.godot, application/bundle_identifier in godot/export_presets.cfg
     EOF
 
 # One-shot: move the Kenney packs into Git LFS (the template ships them as plain git)
@@ -166,7 +168,7 @@ init:
 lfs-adopt:
     sed -i.bak '/^# lfs-template:start/,/^# lfs-template:end/d' .gitattributes && rm .gitattributes.bak
     awk 'NF{for(;n>0;n--)print "";print;next}{n++}' .gitattributes > .gitattributes.new && mv .gitattributes.new .gitattributes
-    git add .gitattributes && git add --renormalize assets/kenney
+    git add .gitattributes && git add --renormalize godot/assets/kenney
     @echo "now commit: git commit -m 'build: move Kenney assets into Git LFS'"
 
 # Store itch.io credentials for the release workflow (needs gh). Create a key at https://itch.io/user/settings/api-keys

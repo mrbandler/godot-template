@@ -1,21 +1,20 @@
 # --- Godot ---------------------------------------------------------------
 .godot/
-/addons/*
-!/addons/broken_reference_finder/
-!/addons/todo_tracker/
-!/addons/unused_resource_finder/
-.ggg.state
+/godot/addons/*
+!/godot/addons/broken_reference_finder/
+!/godot/addons/todo_tracker/
+!/godot/addons/unused_resource_finder/
 /build/
 /reports/
 *.translation
 
 # --- Extensions ----------------------------------------------------------
-/extensions/*/bin/
+/godot/extensions/*/bin/
 /rust/target/
 /cpp/build/
 
 # --- Addon user settings -------------------------------------------------
-/cyclops_settings.config
+/godot/cyclops_settings.config
 
 # --- Nix / devenv / direnv -----------------------------------------------
 .devenv*

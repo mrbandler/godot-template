@@ -70,11 +70,12 @@ jobs:
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
       - name: Godot, export templates and addons
         run: ggg sync --with-export-templates
+        working-directory: godot
       - name: Native unit tests
         run: just test-rust test-cpp
       # Godot rewrites project.godot and drops release-please's annotation comments, so stamp the version here.
       - name: Stamp version from version.txt
-        run: sed -i.bak "s/^config\/version=.*/config\/version=\"$(cat version.txt)\"/" project.godot && rm project.godot.bak
+        run: sed -i.bak "s/^config\/version=.*/config\/version=\"$(cat version.txt)\"/" godot/project.godot && rm godot/project.godot.bak
       - name: Export
         run: just export "$PRESET"
         env:

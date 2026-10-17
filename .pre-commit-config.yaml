@@ -3,7 +3,7 @@
 default_install_hook_types: [pre-commit, commit-msg, pre-push]
 default_stages: [pre-commit]
 # Tool-generated lockfiles and third-party code (addons, submodules) are never touched.
-exclude: ^(devenv\.lock|ggg\.lock|cpp/(godot-cpp|vcpkg)/.*|addons/.*)$
+exclude: ^(devenv\.lock|godot/ggg\.lock|cpp/(godot-cpp|vcpkg)/.*|godot/addons/.*)$
 
 repos:
   - repo: builtin

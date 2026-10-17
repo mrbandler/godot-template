@@ -1,7 +1,7 @@
 { pkgs, lib, config, ... }:
 let
-  # ggg.toml is the single source for the Godot version.
-  gggConfig = builtins.fromTOML (builtins.readFile ./ggg.toml);
+  # godot/ggg.toml is the single source for the Godot version.
+  gggConfig = builtins.fromTOML (builtins.readFile ./godot/ggg.toml);
   godot = pkgs.godot_4_7;
   godotBin = lib.getExe godot;
 
@@ -23,7 +23,7 @@ in
   assertions = [
     {
       assertion = godot.version == gggConfig.project.godot;
-      message = "nixpkgs Godot is ${godot.version} but ggg.toml pins ${gggConfig.project.godot}. Update nixpkgs (devenv update) or ggg.toml.";
+      message = "nixpkgs Godot is ${godot.version} but godot/ggg.toml pins ${gggConfig.project.godot}. Update nixpkgs (devenv update) or godot/ggg.toml.";
     }
   ];
 
@@ -69,6 +69,6 @@ in
     fi
     git lfs pull >/dev/null 2>&1 || echo "warning: git lfs pull failed (offline or no remote?)"
     prek install
-    ggg sync
+    (cd godot && ggg sync)
   '';
 }
