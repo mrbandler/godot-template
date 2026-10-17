@@ -4,3 +4,4 @@ extend-exclude = ["*.lock", "LICENSE", "cpp/godot-cpp", "cpp/vcpkg", "addons", "
 
 [default.extend-words]
 # Project-specific words that typos flags wrongly, e.g. `ratatui = "ratatui"`.
+als = "als" # Ableton Live Set extension in .gitattributes

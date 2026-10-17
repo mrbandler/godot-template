@@ -44,10 +44,22 @@ Tests need devenv: `just test-gd` uses `$GODOT`, which only devenv sets.
 | `extensions/<lang>/` | One `<name>.gdextension` per extension; built libraries in `bin/` (gitignored) |
 | `rust/` | Cargo workspace, `crates/<name>` = one extension (sample: `health`, class `RustHealth`) |
 | `cpp/` | CMake project with `godot-cpp` and `vcpkg` submodules; `extensions/<name>` = one extension (sample: `stamina`, class `CppStamina`) |
+| `raw/` | Source assets (Blender, Aseprite, Krita, audio projects), stored via Git LFS; `.gdignore` hides it from Godot |
 | `devenv.nix`, `justfile`, `.pre-commit-config.yaml` | Tooling |
 | `.github/` | Workflows, dependabot, repo ruleset |
 
-`rust/` and `cpp/` carry `.gdignore` so the editor skips build trees. `docs/` is local-only.
+`rust/`, `cpp/` and `raw/` carry `.gdignore` so the editor skips build trees. `docs/` is local-only.
+
+## Assets and Git LFS
+
+Binary and raw assets (images, audio, video, fonts, 3D and paint sources, Godot binary resources)
+are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.tscn`, `.tres`,
+`.gd`, `.svg`, `.gltf`) stay in plain git so they diff and merge.
+
+- The devenv shell sets LFS up. Without Nix run `git lfs install` (Git for Windows ships git-lfs).
+- Keep sources in `raw/` (Godot ignores it) and export game-ready files into the project tree.
+- **Use this template** on GitHub does not copy LFS objects; the template ships none.
+- Check GitHub's LFS storage and bandwidth limits before committing a lot of large assets.
 
 ## Testing
 

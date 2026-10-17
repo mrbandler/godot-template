@@ -37,6 +37,7 @@ in
     ggg
     just
     prek
+    git-lfs
     typos
     zizmor
     cargo-shear
@@ -60,6 +61,11 @@ in
   };
 
   enterShell = ''
+    # git-lfs first: prek then keeps its pre-push hook as pre-push.legacy and runs it on every push.
+    if [ ! -f .git/hooks/pre-push.legacy ]; then
+      rm -f .git/hooks/pre-push
+      git lfs install --local
+    fi
     prek install
     ggg sync
   '';

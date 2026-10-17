@@ -23,6 +23,12 @@ devenv.local.nix
 .direnv/
 /result
 
+# --- Raw asset tool backups --------------------------------------------
+*.blend[0-9]*
+*.kra~
+*.aup3-shm
+*.aup3-wal
+
 # --- Local environment ---------------------------------------------------
 .env
 .env.*
