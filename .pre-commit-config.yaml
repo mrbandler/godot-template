@@ -80,10 +80,12 @@ repos:
         files: ^cpp/extensions/.*\.(cpp|hpp|h)$
       - id: clang-tidy
         name: clang-tidy
-        # Configure first so compile_commands.json exists (fast after the first run).
+        # Configure first so compile_commands.json exists, and generate the godot-cpp bindings
+        # (gdextension_interface.h and the class headers are build outputs). Fast after the first run.
         # Bare clang-tidy lacks the wrapped compiler's system include paths, so pass them on.
         entry: >-
           bash -c 'cmake --preset debug -S cpp >/dev/null &&
+          cmake --build cpp/build/debug --target generate_bindings >/dev/null &&
           sys=$(c++ -E -x c++ -v /dev/null 2>&1 | sed -n "/^#include <...>/,/^End of/p" | grep "^ /" | grep -v framework | sed "s/^ /--extra-arg=-isystem/") &&
           clang-tidy -p cpp/build/debug --quiet $sys "$@"' --
         language: system
