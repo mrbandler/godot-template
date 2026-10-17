@@ -16,6 +16,8 @@ from the first commit, with automated builds and releases to itch.io.
 1. Click **Use this template** on GitHub.
 2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks and runs `ggg sync`.
 3. `just test`
+   Optional: `just lfs-adopt` moves the Kenney packs into Git LFS like the rest of your assets (it edits
+   `.gitattributes` and stages the files; then commit).
 4. `ggg edit` (or `godot -e`) to open the editor.
 5. Rename the game: `config/name` in `project.godot` and `application/bundle_identifier` in `export_presets.cfg`.
 
@@ -65,7 +67,9 @@ are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.ts
 
 - The devenv shell sets LFS up. Without Nix run `git lfs install` (Git for Windows ships git-lfs).
 - Keep sources in `raw/` (Godot ignores it) and export game-ready files into the project tree.
-- **Use this template** on GitHub does not copy LFS objects; the template ships none.
+- **Use this template** on GitHub cannot copy files stored with Git LFS, so the template ships no LFS
+  files: the Kenney packs under `assets/kenney/` are plain git (`.gitattributes` overrides the LFS rules
+  there). Your own assets use LFS as described above.
 - Check GitHub's LFS storage and bandwidth limits before committing a lot of large assets.
 
 ## Included assets

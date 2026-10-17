@@ -131,3 +131,9 @@
 *.a lfs
 *.lib lfs
 *.pdb lfs
+
+# lfs-template:start
+# Template only: GitHub templates cannot contain LFS files. After creating your project,
+# delete this block and run `just lfs-adopt`. Keep it AFTER the LFS rules above.
+assets/kenney/** -filter -diff -merge -text
+# lfs-template:end

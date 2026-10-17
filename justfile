@@ -131,6 +131,12 @@ export preset: (build "release") import
 export preset: (build "release") import
     New-Item -ItemType Directory -Force build/{{ preset }} | Out-Null; New-Item -ItemType File -Force build/.gdignore | Out-Null; {{ godot }} --headless --export-release "{{ preset }}"
 
+# One-shot: move the Kenney packs into Git LFS (the template ships them as plain git)
+[unix]
+lfs-adopt:
+    sed -i.bak '/^# lfs-template:start/,/^# lfs-template:end/d' .gitattributes && rm .gitattributes.bak
+    git add .gitattributes && git add --renormalize assets/kenney
+    @echo "now commit: git commit -m 'build: move Kenney assets into Git LFS'"
 
 # Store itch.io credentials for the release workflow (needs gh). Create a key at https://itch.io/user/settings/api-keys
 itch-setup user game:
