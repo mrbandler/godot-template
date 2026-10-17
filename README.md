@@ -16,15 +16,16 @@ from the first commit, with automated builds and releases to itch.io.
 1. Click **Use this template** on GitHub, then clone with `git clone --recurse-submodules`
    (the C++ side needs both `cpp/godot-cpp` and `cpp/vcpkg`; the devenv shell also initialises them).
 2. In the clone: `direnv allow` (or `devenv shell`). This installs the tools, the git hooks, pulls LFS files and runs `ggg sync`.
-3. `just init` (once, needs `gh auth login` and the `origin` remote). It:
+3. `just init` (needs `gh auth login` and the `origin` remote; safe to re-run after a failure). It:
    - runs `just lfs-adopt` and commits the result (Kenney packs move into Git LFS),
-   - runs `just gh-setup` (ruleset and squash-only merges),
    - creates the dependabot labels,
-   - prints the remaining manual steps. It never pushes.
+   - prints the next steps. It never pushes and does not apply the ruleset.
+   `init` and `lfs-adopt` need a Unix shell (macOS, Linux, or WSL/Git Bash on Windows).
    Then `just test`.
-4. `ggg edit` (or `godot -e`) to open the editor.
-5. Rename the game: `config/name` in `project.godot` and `application/bundle_identifier` in `export_presets.cfg`.
-6. Finish the manual steps in [Releasing](#releasing) (GitHub App, `just itch-setup`), then `git push`.
+4. `git push` (puts the setup commit on main), then `just gh-setup` (ruleset and squash-only merges; run once, after the push, because the ruleset requires PRs).
+5. `ggg edit` (or `godot -e`) to open the editor.
+6. Rename the game: `config/name` in `project.godot` and `application/bundle_identifier` in `export_presets.cfg`.
+7. Finish the manual steps in [Releasing](#releasing) (GitHub App, `just itch-setup`).
 
 `just lfs-adopt` and `just gh-setup` also work on their own.
 
@@ -202,7 +203,7 @@ recipe and CI step skips itself when the folder is gone.
 
 Setup, once per repository created from the template:
 
-1. `just init` already applied the `main` ruleset (`just gh-setup`) and created the dependabot labels.
+1. `just init` created the dependabot labels; after `git push`, `just gh-setup` applies the `main` ruleset and merge settings.
 2. **GitHub App** for release-please (create once per account, install on each repo). Actions run
    with the built-in `GITHUB_TOKEN`, and GitHub deliberately does not start other workflows from
    events that token causes. With it, CI would never run on the release PR (so the required
