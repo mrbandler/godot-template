@@ -61,6 +61,17 @@ are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.ts
 - **Use this template** on GitHub does not copy LFS objects; the template ships none.
 - Check GitHub's LFS storage and bandwidth limits before committing a lot of large assets.
 
+## Included assets
+
+[Kenney](https://kenney.nl) assets, CC0 (public domain), each pack keeps its `License.txt`.
+
+| Path | Content | License |
+|---|---|---|
+| `assets/kenney/prototype_textures/` | Prototype Textures: 6 colours x 13 grid textures with a ready `texture_NN.tres` material each | CC0 |
+
+Drag a `texture_NN.tres` onto a mesh, CSG or Cyclops block. The materials use world-space
+triplanar mapping, so 1 grid cell = 1 m and neighbouring blocks line up.
+
 ## Testing
 
 Each language has the same sample, a health value (damage, heal, clamp). Logic lives in code
