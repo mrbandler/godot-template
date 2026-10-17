@@ -68,9 +68,13 @@ are tracked with Git LFS; `.gitattributes` lists the formats. Text formats (`.ts
 | Path | Content | License |
 |---|---|---|
 | `assets/kenney/prototype_textures/` | Prototype Textures: 6 colours x 13 grid textures with a ready `texture_NN.tres` material each | CC0 |
+| `assets/kenney/prototype_kit/` | Prototype Kit: 145 greyboxing GLB models (walls, floors, doors, props); `Textures/` holds the colormap and variation-a/b/c | CC0 |
+| `assets/kenney/cursors/` | Cursor Pack: basic default-style mouse cursors (182 images) | CC0 |
 
 Drag a `texture_NN.tres` onto a mesh, CSG or Cyclops block. The materials use world-space
 triplanar mapping, so 1 grid cell = 1 m and neighbouring blocks line up.
+
+Fonts, UI sounds, particles and more Kenney packs are per project, at <https://kenney.nl>.
 
 ## Testing
 
