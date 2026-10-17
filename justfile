@@ -121,10 +121,16 @@ gh-setup:
     gh api --method PATCH "repos/{owner}/{repo}" -F allow_squash_merge=true -F allow_merge_commit=false -F allow_rebase_merge=false -F delete_branch_on_merge=true -f squash_merge_commit_title=PR_TITLE -f squash_merge_commit_message=PR_BODY
 
 # Export a preset (Linux | Windows | macOS) to build/<preset>/ with release libraries
+[unix]
 export preset: (build "release") import
     mkdir -p build/{{ preset }}
     touch build/.gdignore
     {{ godot }} --headless --export-release "{{ preset }}"
+
+[windows]
+export preset: (build "release") import
+    New-Item -ItemType Directory -Force build/{{ preset }} | Out-Null; New-Item -ItemType File -Force build/.gdignore | Out-Null; {{ godot }} --headless --export-release "{{ preset }}"
+
 
 # Store itch.io credentials for the release workflow (needs gh). Create a key at https://itch.io/user/settings/api-keys
 itch-setup user game:
