@@ -13,6 +13,8 @@ import:
 
 # GDScript tests (GdUnit4). Extra args go to Godot, e.g. display flags under xvfb.
 test-gd *ARGS="--headless --ignoreHeadlessMode": build import
+    mkdir -p reports
+    touch reports/.gdignore
     bash addons/gdUnit4/runtest.sh --godot_binary "$GODOT" -a res://test -c -rd reports {{ ARGS }}
 
 lib_ext := if os() == "macos" { "dylib" } else if os() == "windows" { "dll" } else { "so" }
@@ -121,6 +123,7 @@ gh-setup:
 # Export a preset (Linux | Windows | macOS) to build/<preset>/ with release libraries
 export preset: (build "release") import
     mkdir -p build/{{ preset }}
+    touch build/.gdignore
     {{ godot }} --headless --export-release "{{ preset }}"
 
 # Store itch.io credentials for the release workflow (needs gh). Create a key at https://itch.io/user/settings/api-keys
