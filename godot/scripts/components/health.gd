@@ -5,10 +5,10 @@ var max_value: int
 var current: int
 
 
-static func create(max_value: int) -> Health:
+static func create(maximum: int) -> Health:
 	var health := Health.new()
-	health.max_value = max_value
-	health.current = max_value
+	health.max_value = maximum
+	health.current = maximum
 	return health
 
 

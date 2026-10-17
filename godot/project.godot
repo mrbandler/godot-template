@@ -25,16 +25,24 @@ PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_came
 
 [debug]
 
+gdscript/warnings/unused_variable=2
+gdscript/warnings/unused_local_constant=2
+gdscript/warnings/shadowed_variable=2
 gdscript/warnings/untyped_declaration=2
 gdscript/warnings/unsafe_property_access=2
 gdscript/warnings/unsafe_method_access=2
 gdscript/warnings/unsafe_cast=2
 gdscript/warnings/unsafe_call_argument=2
+gdscript/warnings/missing_await=1
+gdscript/warnings/integer_division=2
+gdscript/warnings/narrowing_conversion=2
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [editor_plugins]
 
@@ -58,6 +66,11 @@ limbo_console_search_history={
 ]
 }
 
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
 [rendering]
 
+rendering_device/driver.windows="d3d12"
 textures/vram_compression/import_etc2_astc=true
